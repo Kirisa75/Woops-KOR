@@ -4,7 +4,7 @@ const { Client, Util, DiscordAPIError } = require('discord.js')
 const ytdl = require('ytdl-core')
 const YouTube = require('simple-youtube-api')
 const PREFIX = ';'
-
+const TOKEN = 'NjExMTk3MzIwNjI0NjAzMTQ2.XVQT3A.jztbJ0yAWS3EvaDoaGRSZIMRgaw'
 const client = new Client({ disableEveryone: true })
 const YTOKEN = 'AIzaSyBZWdBvhuVESZz9wRJSgArGNvBaAcZzIHU'
 const youtube = new YouTube(YTOKEN)
