@@ -7,7 +7,7 @@ const PREFIX = ';'
 
 const client = new Client({ disableEveryone: true })
 
-const youtube = new YouTube(process.env.YTOKEN)
+const youtube = new YouTube(YTOKEN)
 
 const queue = new Map()
 
@@ -272,4 +272,4 @@ function play(guild, song) {
     serverQueue.textChannel.send(`재생시작: **${song.title}**`)
 }
 
-client.login(process.env.TOKEN)
+client.login(TOKEN)
