@@ -3,5 +3,8 @@
     "version": "1.0.0",
     "description": "my first music bot",
     "main": "index.js",
-    "author": "NKirisa"
+    "author": "NKirisa",
+    "dependencies": {
+        "dotenv": "^8.2.0"
+    }
 }
