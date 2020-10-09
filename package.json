@@ -1,0 +1,7 @@
+{
+    "name": "Woops-music-bot",
+    "version": "1.0.0",
+    "description": "my first music bot",
+    "main": "index.js",
+    "author": "NKirisa"
+}
