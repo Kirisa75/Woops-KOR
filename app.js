@@ -6,7 +6,7 @@ const YouTube = require('simple-youtube-api')
 const PREFIX = ';'
 
 const client = new Client({ disableEveryone: true })
-
+const YTOKEN = 'AIzaSyBZWdBvhuVESZz9wRJSgArGNvBaAcZzIHU'
 const youtube = new YouTube(YTOKEN)
 
 const queue = new Map()
