@@ -13,12 +13,7 @@ const queue = new Map()
 
 client.on('ready', () => {
     console.log('Active')
-    client.user.setPresence({
-        status: "Online",
-        game: {
-            name: ";help",
-        }
-    })
+    client.user.setActivity(';help', { type: "LISTENING"})
 })
 
 client.on('message', async message => {
