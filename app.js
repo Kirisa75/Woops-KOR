@@ -10,6 +10,11 @@ const youtube = new YouTube(YTOKEN)
 
 const queue = new Map()
 
+const http = require("http");
+setInterval(function () {
+  http.get("http://woops-kor.herokuapp.com");
+}, 600000);
+
 
 client.on('ready', () => {
     console.log('Active')
