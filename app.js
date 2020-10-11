@@ -57,7 +57,7 @@ client.on('message', async message => {
 __**Song Selection:**__
 ${videos.map(video2 => `**${++index} -** ${video2.title}`).join('\n')}
 
-Please select one of the songs ranging from 1-10
+1 ~ 10 개의 노래 중 하나를 선택하세요.
                     `)
                     try {
                         var responce = await message.channel.awaitMessages(msg => msg.content > 0 && msg.content < 11, {
@@ -78,7 +78,7 @@ Please select one of the songs ranging from 1-10
         }
 
 
-    } else if (message.content.startsWith(`${PREFIX}stop`)) {
+    } else if (message.content.startsWith(`${PREFIX}clear`)) {
         if(!message.member.voice.channel) return message.channel.send("음악을 중지하려면 음성채널에 있어야합니다")
         if(!serverQueue) return message.channel.send("아무것도 재생되고 있지 않습니다.")
         serverQueue.songs = []
@@ -108,12 +108,12 @@ Please select one of the songs ranging from 1-10
         if(!serverQueue) return message.channel.send("아무것도 재생되고 있지 않습니다.")
         message.channel.send(`
         __**노래 대기열:**__
-    ${serverQueue.songs.map(song => `**-** ${song.title}`).join('\n')}
+${serverQueue.songs.map(song => `**-** ${song.title} - Request by ${message.author.tag}`).join('\n')}
 
     **재생중:** ${serverQueue.songs[0].title}
         `, { split: true })
         return undefined
-    } else if (message.content.startsWith(`${PREFIX}pause`)) {
+    } else if (message.content.startsWith(`${PREFIX}stop`)) {
         if(!message.member.voice.channel) return message.channel.send("일시정지 명령을 사용하려면 음성채널에  있어야 합니다.")
         if(!serverQueue) return message.channel.send("아무것도 재생되고 있지 않습니다.")
         if(!serverQueue.playing) return message.channel.send("음악이 이미 일시정지 되어있습니다.")
