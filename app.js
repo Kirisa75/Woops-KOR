@@ -10,11 +10,24 @@ const youtube = new YouTube(YTOKEN)
 
 const queue = new Map()
 
-const http = require("http");
-setInterval(function () {
-  http.get("http://woops-kor.herokuapp.com");
-}, 600000);
+/////////////////////
 
+
+const express = require('express');
+const server = express();
+
+server.all('/', (req, res)=>{
+    res.send('Your bot is alive!')
+})
+
+function keepAlive(){
+    server.listen(3000, ()=>{console.log("Server is Ready!" + Date.now()) });
+}
+
+keepAlive();
+
+
+/////////////////////
 
 client.on('ready', () => {
     console.log('Active')
