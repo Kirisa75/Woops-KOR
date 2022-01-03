@@ -5,7 +5,7 @@ const ytdl = require('ytdl-core')
 const YouTube = require('simple-youtube-api')
 const PREFIX = ';'
 const client = new Client({ disableEveryone: true })
-const YTOKEN = 'AIzaSyBZWdBvhuVESZz9wRJSgArGNvBaAcZzIHU'
+const YTOKEN = 'AIzaSyCvLiaWbnoMyQ7RZ6VkeZOGfKkLit0eLuA'
 const youtube = new YouTube(YTOKEN)
 
 const queue = new Map()
