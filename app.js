@@ -20,6 +20,10 @@ client.on('ready', () => {
     client.user.setActivity(';help', { type: "LISTENING"})
 })
 
+client.on('error', error => {
+    console.error('The WebSocket encountered an error:', error);
+});
+
 client.on('message', async message => {
     if(message.author.bot) return
     if(!message.content.startsWith(PREFIX)) return
