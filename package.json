@@ -5,7 +5,7 @@
     "main": "index.js",
     "author": "NKirisa",
     "engines": {
-        "node": "v14.18.2"
+        "node": "v17.3.0"
     },
     "dependencies": {
         "@discordjs/opus": "^0.3.3",
