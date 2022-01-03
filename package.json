@@ -14,7 +14,7 @@
         "express": "^4.17.2",
         "ffmpeg": "0.0.4",
         "ffmpeg-static": "^4.2.7",
-        "opus": "0.0.0",
+        "opus": "0.3.3",
         "opusscript": "0.0.7",
         "prism-media": "^1.2.2",
         "simple-youtube-api": "^5.2.1",
