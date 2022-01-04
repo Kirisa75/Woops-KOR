@@ -1,4 +1,5 @@
 require('dotenv').config()
+import { joinVoiceChannel } from "@discordjs/voice";
 
 const { Client, Util, DiscordAPIError } = require('discord.js')
 const ytdl = require('ytdl-core')
@@ -9,6 +10,7 @@ const YTOKEN = 'AIzaSyCvLiaWbnoMyQ7RZ6VkeZOGfKkLit0eLuA'
 const youtube = new YouTube(YTOKEN)
 
 const queue = new Map()
+
 
 /////////////////////
 
@@ -232,7 +234,12 @@ async function handleVideo(video, message, voiceChannel, playList = false) {
         queueConstruct.songs.push(song)
 
         try {
-            var connection = await voiceChannel.join()
+            var connection = joinVoiceChannel(
+                {
+                    channelId: message.member.voice.channel,
+                    guildId: message.guild.id,
+                    adapterCreator: message.guild.voiceAdapterCreator
+                });
             queueConstruct.connection = connection
             play(message.guild, queueConstruct.songs[0])
         } catch (error) {
