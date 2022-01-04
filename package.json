@@ -10,7 +10,7 @@
     "dependencies": {
         "@discordjs/opus": "latest",
         "@discordjs/voice": "^0.7.5",
-        "discord.js": "latest",
+        "discord.js": "^12.5.3",
         "dotenv": "latest",
         "express": "latest",
         "ffmpeg": "latest",

@@ -1,7 +1,6 @@
 require('dotenv').config()
 
 const { Client, Util, DiscordAPIError } = require('discord.js')
-const { joinVoiceChannel } = require('@discordjs/voice')
 const ytdl = require('ytdl-core')
 const YouTube = require('simple-youtube-api')
 const PREFIX = ';'
@@ -234,12 +233,7 @@ async function handleVideo(video, message, voiceChannel, playList = false) {
         queueConstruct.songs.push(song)
 
         try {
-            var connection = joinVoiceChannel(
-                {
-                    channelId: message.member.voice.channel,
-                    guildId: message.guild.id,
-                    adapterCreator: message.guild.voiceAdapterCreator
-                });
+            const connection = await voiceChannel.join()
             queueConstruct.connection = connection
             play(message.guild, queueConstruct.songs[0])
         } catch (error) {
@@ -278,4 +272,4 @@ function play(guild, song) {
     serverQueue.textChannel.send(`재생시작: **${song.title}**`)
 }
 
-client.login(process.env.TOKEN)
+client.login("NjExMTk3MzIwNjI0NjAzMTQ2.XVQT3A.zpn8GFVtpImK64PjkJ4Yafk0Yhk")
