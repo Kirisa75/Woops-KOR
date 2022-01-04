@@ -271,4 +271,4 @@ function play(guild, song) {
     serverQueue.textChannel.send(`재생시작: **${song.title}**`)
 }
 
-client.login("NjExMTk3MzIwNjI0NjAzMTQ2.XVQT3A.pglLNnwz6zPU7bMl_q1hJn-esxU")
+client.login(process.env.TOKEN)
