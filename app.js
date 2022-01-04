@@ -1,10 +1,10 @@
 require('dotenv').config()
 
-const { Client, Util, DiscordAPIError } = require('discord.js')
+const { Client, Util, DiscordAPIError, Discord } = require('discord.js')
 const ytdl = require('ytdl-core')
 const YouTube = require('simple-youtube-api')
 const PREFIX = ';'
-const client = new Client({ disableEveryone: false })
+const client = new Discord.Client()
 const YTOKEN = 'AIzaSyCvLiaWbnoMyQ7RZ6VkeZOGfKkLit0eLuA'
 const youtube = new YouTube(YTOKEN)
 
