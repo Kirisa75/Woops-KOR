@@ -1,7 +1,7 @@
 require('dotenv').config()
-import { joinVoiceChannel } from "@discordjs/voice";
 
 const { Client, Util, DiscordAPIError } = require('discord.js')
+const { joinVoiceChannel } = require('@discordjs/voice')
 const ytdl = require('ytdl-core')
 const YouTube = require('simple-youtube-api')
 const PREFIX = ';'
