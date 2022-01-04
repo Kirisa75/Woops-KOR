@@ -1,10 +1,10 @@
 require('dotenv').config()
 
-const { Client, Util, DiscordAPIError, Discord } = require('discord.js')
+const { Client, Util, DiscordAPIError } = require('discord.js')
 const ytdl = require('ytdl-core')
 const YouTube = require('simple-youtube-api')
 const PREFIX = ';'
-const client = new Discord.Client()
+const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS"] })
 const YTOKEN = 'AIzaSyCvLiaWbnoMyQ7RZ6VkeZOGfKkLit0eLuA'
 const youtube = new YouTube(YTOKEN)
 
