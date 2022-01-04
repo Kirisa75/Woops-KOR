@@ -2,7 +2,7 @@
     "name": "Woops-music-bot",
     "version": "1.0.0",
     "description": "my first music bot",
-    "main": "index.js",
+    "main": "app.js",
     "author": "NKirisa",
     "engines": {
         "node": "v16.13.1"
