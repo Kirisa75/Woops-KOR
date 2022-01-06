@@ -1,6 +1,16 @@
+const express = require('express');
+const app = express();
+const port = 3000;
+
+app.get('/', (req, res) => res.send('Hello World!'));
+
+app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
+
+
 require('dotenv').config()
 
 const { Client, Util, DiscordAPIError } = require('discord.js')
+const Discord = require('discord.js')
 const ytdl = require('ytdl-core')
 const YouTube = require('simple-youtube-api')
 const PREFIX = ';'
@@ -31,12 +41,26 @@ client.on('message', async message => {
     const url = args[1] ? args[1].replace(/<(.+)>/g, '$1') : ""
     const serverQueue = queue.get(message.guild.id)
 
+    const helpembed = new Discord.MessageEmbed()
+                            .setColor('#0099ff')
+                            .setTitle('Woops Commands')
+                            .addFields(
+                                {name: ';play <TITLE|URL> | ;p <TITLE|URL>', value: 'Play a song with that address and title'},
+                                {name: ';skip | ;s', value: 'Skip the currently playing song'},
+                                {name: ';np', value: 'Shows the title of the currently playing song'},
+                                {name: ';stop', value: 'Pause the currently playing song'},
+                                {name: ';resume', value: 'Replay a paused song'},
+                                {name: ';clear', value: 'Delete all requests'},
+                                {name: ';queue', value: 'Show the song queue'},
+                                {name: ';loop', value: 'Loop the requests'},
+                                );
+
     if(message.content.startsWith(`${PREFIX}p`)) { //play
         const voiceChannel = message.member.voice.channel
-        if(!voiceChannel) return message.channel.send("당신이 음성채널에 들어가 있어야합니다!")
+        if(!voiceChannel) return message.channel.send("You must be on the audio channel!")
         const permissions = voiceChannel.permissionsFor(message.client.user)
-        if(!permissions.has('CONNECT')) return message.channel.send("음성채널에 연결할 권한이 없습니다.")
-        if(!permissions.has('SPEAK')) return message.channel.send("채널에서의 발언권이 없습니다.")
+        if(!permissions.has('CONNECT')) return message.channel.send("The bot does not have permission to connect to the voice channel.")
+        if(!permissions.has('SPEAK')) return message.channel.send("The bot has no say in the channel.")
 
         if(url.match(/^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/)) {
             const playList = await youtube.getPlaylist(url)
@@ -45,7 +69,7 @@ client.on('message', async message => {
                 const video2 = await youtube.getVideoByID(video.id)
                 await handleVideo(video2, message, voiceChannel, true)
             }
-            message.channel.send(`플레이리스트 **${playList.title}** 는 목록에 추가되었습니다.`)
+            message.channel.send(`Playlist **${playList.title}** has been added to the list.`)
             return undefined
         } else {
             try{
@@ -55,10 +79,10 @@ client.on('message', async message => {
                     var videos = await youtube.searchVideos(searchString, 10)
                     var index = 0
                     message.channel.send(`
-__**Song Selection:**__
+__** Song Selection : **__
 ${videos.map(video2 => `**${++index} -** ${video2.title}`).join('\n')}
 
-1 ~ 10 개의 노래 중 하나를 선택하세요.
+Choose from 1 ~ 10 songs.
                     `)
                     try {
                         var responce = await message.channel.awaitMessages(msg => msg.content > 0 && msg.content < 11, {
@@ -67,12 +91,12 @@ ${videos.map(video2 => `**${++index} -** ${video2.title}`).join('\n')}
                             errors: ['time']
                         })
                     } catch {
-                        message.channel.send(`No or invalid song selection was provided`)
+                        message.channel.send(`No or invalid song selection was provided.`)
                     }
                     const videoIndex = parseInt(responce.first().content)
                     var video = await youtube.getVideoByID(videos[videoIndex - 1].id)
                 } catch {
-                    return message.channel.send("검색결과를 찾을수 없습니다.")
+                    return message.channel.send("No search results found.")
                 }
             }
             return handleVideo(video, message, voiceChannel)
@@ -80,85 +104,71 @@ ${videos.map(video2 => `**${++index} -** ${video2.title}`).join('\n')}
 
 
     } else if (message.content.startsWith(`${PREFIX}clear`)) {
-        if(!message.member.voice.channel) return message.channel.send("음악을 중지하려면 음성채널에 있어야합니다")
-        if(!serverQueue) return message.channel.send("아무것도 재생되고 있지 않습니다.")
+        if(!message.member.voice.channel) return message.channel.send("You must be on a voice channel to use commands.")
+        if(!serverQueue) return message.channel.send("Nothing is playing.")
         serverQueue.songs = []
         serverQueue.connection.dispatcher.end()
-        message.channel.send("재생되고 있는 음악을 멈췄습니다.")
+        message.channel.send("Removed all requests.")
         return undefined
     } else if (message.content.startsWith(`${PREFIX}skip`)) {
-        if(!message.member.voice.channel) return message.channel.send("You need to be in a voice channel to skip the music")
-        if(!serverQueue) return message.channel.send("아무것도 재생되고 있지 않습니다.")
+        if(!message.member.voice.channel) return message.channel.send("You need to be in a voice channel to skip the music.")
+        if(!serverQueue) return message.channel.send("Nothing is playing.")
         serverQueue.connection.dispatcher.end()
-        message.channel.send("당신을 위해 음악을 넘겼어요.")
+        message.channel.send("⏭️Skipped.")
         return undefined
     } else if (message.content.startsWith(`${PREFIX}volume`)) {
-        if(!message.member.voice.channel) return message.channel.send("음악 명령을 사용하려면 음성채널에 있어야 합니다.")
-        if(!serverQueue) return message.channel.send("아무것도 재생되고 있지 않습니다.")
-        if(!args[1]) return message.channel.send(`볼륨: **${serverQueue.volume}**`)
-        if(isNaN(args[1])) return message.channel.send("볼륨을 바꿀수있는 유효수치가 아닙니다.")
+        if(!message.member.voice.channel) return message.channel.send("You must be on a voice channel to use commands.")
+        if(!serverQueue) return message.channel.send("Nothing is playing")
+        if(!args[1]) return message.channel.send(`Volume : **${serverQueue.volume}**`)
+        if(isNaN(args[1])) return message.channel.send("It is not a valid value to change the volume.")
         serverQueue.volume = args[1]
         serverQueue.connection.dispatcher.setVolumeLogarithmic(args[1] / 5)
-        message.channel.send(`볼륨을 다음으로 변경하였습니다: **${args[1]}**`)
+        message.channel.send(`Changed the volume to : **${args[1]}**`)
         return undefined
     } else if (message.content.startsWith(`${PREFIX}np`)) {
-        if(!serverQueue) return message.channel.send("아무것도 재생되고 있지 않습니다.")
-        message.channel.send(`지금 재생중: **${serverQueue.songs[0].title}**`)
+        if(!serverQueue) return message.channel.send("Nothing is playing.")
+        message.channel.send(`▶️ Now Playing : **${serverQueue.songs[0].title}**`)
         return undefined
     } else if (message.content.startsWith(`${PREFIX}queue`)) {
-        if(!serverQueue) return message.channel.send("아무것도 재생되고 있지 않습니다.")
+        if(!serverQueue) return message.channel.send("Nothing is playing.")
         message.channel.send(`
-        __**노래 대기열:**__
+        __** Playlist : **__
 ${serverQueue.songs.map(song => `**-** ${song.title} - Request by ${message.author.tag}`).join('\n')}
 
-    **재생중:** ${serverQueue.songs[0].title}
+    ** Now Playing : ** ${serverQueue.songs[0].title}
         `, { split: true })
         return undefined
     } else if (message.content.startsWith(`${PREFIX}stop`)) {
-        if(!message.member.voice.channel) return message.channel.send("일시정지 명령을 사용하려면 음성채널에  있어야 합니다.")
-        if(!serverQueue) return message.channel.send("아무것도 재생되고 있지 않습니다.")
-        if(!serverQueue.playing) return message.channel.send("음악이 이미 일시정지 되어있습니다.")
+        if(!message.member.voice.channel) return message.channel.send("You must be on a voice channel to use commands.")
+        if(!serverQueue) return message.channel.send("Nothing is playing.")
+        if(!serverQueue.playing) return message.channel.send("Already paused.")
+        serverQueue.playing = false
         serverQueue.connection.dispatcher.pause()
-        message.channel.send("당신을 위해 음악을 일시정지 했습니다.")
+        message.channel.send("⏸️ Paused.")
         return undefined
     } else if (message.content.startsWith(`${PREFIX}resume`)) {
-        if(!message.member.voice.channel) return message.channel.send("다시 재생 명령어를 사용하려면 음성채널에 있어야 합니다.")
-        if(!serverQueue) return message.channel.send("아무것도 재생되고 있지 않습니다.")
-        if(serverQueue.playing) return message.channel.send("음악이 이미 재생중입니다.")
+        if(!message.member.voice.channel) return message.channel.send("You must be on a voice channel to use commands.")
+        if(!serverQueue) return message.channel.send("Nothing is playing.")
+        if(serverQueue.playing) return message.channel.send("Music is already playing.")
         serverQueue.playing = true
         serverQueue.connection.dispatcher.resume()
-        message.channel.send("당신을 위해 음악을 다시 재생되고 있습니다.")
+        message.channel.send("▶️ Resumed music.")
         return undefined
     } else if (message.content.startsWith(`${PREFIX}loop`)) {
-        if(!message.member.voice.channel) return message.channel.send('이 명령어를 사용하려면 음성채널에 있어야 합니다.')
-        if(!serverQueue) return message.channel.send('아무것도 재생되고 있지 않습니다.')
+        if(!message.member.voice.channel) return message.channel.send('You must be on a voice channel to use this command.')
+        if(!serverQueue) return message.channel.send('Nothing is playing.')
 
         serverQueue.loop = !serverQueue.loop
 
-        return message.channel.send(`I have now ${serverQueue.loop ? `**Enabled**` : `**Disable**`} loop.`)
+        return message.channel.send(`🔁 I have now ${serverQueue.loop ? `**Enabled**` : `**Disable**`} loop.`)
     } else if (message.content.startsWith(`${PREFIX}help`)) {
-        message.channel.send({embed: {
-            color: 3447003,
-            author: {
-                name: client.user.username,
-                icorn_url: client.user.avatarURL
-            },
-            title: "Command List",
-            description: ";play (;p)\n;stop\n;resume\n;skip (;s)\n;loop\n;volume\n",
-            timestamp: new Date(),
-            footer: {
-                icorn_url: client.user.avatarURL,
-                text: "ⓒ N"
-            },
-            //https://github.com/AnIdiotsGuide/discordjs-bot-guide/blob/master/first-bot/using-embeds-in-messages.md
-        }
-    })
+        message.author.send(helpembed)
     } else if (message.content.startsWith(`${PREFIX}play`)) {
         const voiceChannel = message.member.voice.channel
-        if(!voiceChannel) return message.channel.send("당신이 음성채널에 들어가 있어야합니다!")
+        if(!voiceChannel) return message.channel.send("You must be on the audio channel!")
         const permissions = voiceChannel.permissionsFor(message.client.user)
-        if(!permissions.has('CONNECT')) return message.channel.send("음성채널에 연결할 권한이 없습니다.")
-        if(!permissions.has('SPEAK')) return message.channel.send("채널에서의 발언권이 없습니다.")
+        if(!permissions.has('CONNECT')) return message.channel.send("The bot does not have permission to connect to the voice channel.")
+        if(!permissions.has('SPEAK')) return message.channel.send("The bot has no say in the channel.")
 
         if(url.match(/^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/)) {
             const playList = await youtube.getPlaylist(url)
@@ -167,7 +177,7 @@ ${serverQueue.songs.map(song => `**-** ${song.title} - Request by ${message.auth
                 const video2 = await youtube.getVideoByID(video.id)
                 await handleVideo(video2, message, voiceChannel, true)
             }
-            message.channel.send(`플레이리스트 **${playList.title}** 는 목록에 추가되었습니다.`)
+            message.channel.send(`Playlist **${playList.title}** has been added to the list.`)
             return undefined
         } else {
             try{
@@ -177,7 +187,7 @@ ${serverQueue.songs.map(song => `**-** ${song.title} - Request by ${message.auth
                     var videos = await youtube.searchVideos(searchString, 10)
                     var index = 0
                     message.channel.send(`
-__**Song Selection:**__
+__** Song Selection : **__
 ${videos.map(video2 => `**${++index} -** ${video2.title}`).join('\n')}
 
 Please select one of the songs ranging from 1-10
@@ -189,21 +199,21 @@ Please select one of the songs ranging from 1-10
                             errors: ['time']
                         })
                     } catch {
-                        message.channel.send(`No or invalid song selection was provided`)
+                        message.channel.send(`No or invalid song selection was provided.`)
                     }
                     const videoIndex = parseInt(responce.first().content)
                     var video = await youtube.getVideoByID(videos[videoIndex - 1].id)
                 } catch {
-                    return message.channel.send("검색결과를 찾을수 없습니다.")
+                    return message.channel.send("No search results found.")
                 }
             }
             return handleVideo(video, message, voiceChannel)
         }
     } else if (message.content.startsWith(`${PREFIX}s`)) {
-        if(!message.member.voice.channel) return message.channel.send("You need to be in a voice channel to skip the music")
-        if(!serverQueue) return message.channel.send("아무것도 재생되고 있지 않습니다.")
+        if(!message.member.voice.channel) return message.channel.send("You need to be in a voice channel to skip the music.")
+        if(!serverQueue) return message.channel.send("Nothing is playing.")
         serverQueue.connection.dispatcher.end()
-        message.channel.send("당신을 위해 음악을 넘겼어요.")
+        message.channel.send("⏭️ Skipped.")
         return undefined
     }
 
@@ -237,15 +247,15 @@ async function handleVideo(video, message, voiceChannel, playList = false) {
             queueConstruct.connection = connection
             play(message.guild, queueConstruct.songs[0])
         } catch (error) {
-            console.log(`음성채널 연결중 오류가 발생하였습니다: ${error}`)
+            console.log(`An error occurred while connecting the voice channel. : ${error}`)
             queue.delete(message.guild.id)
-            message.channel.send(`음성채널 연결중 오류가 발생하였습니다: ${error}`)
+            message.channel.send(`An error occurred while connecting the voice channel. : ${error}`)
         }
 
     } else {
         serverQueue.songs.push(song)
         if (playList) return undefined
-        else return message.channel.send(`**${song.title}** 이 대기열에 추가되었습니다.`)
+        else return message.channel.send(`**${song.title}** has been added to this queue.`)
     }
     return undefined
 }
@@ -259,7 +269,10 @@ function play(guild, song) {
         return
     }
 
-    const dispatcher = serverQueue.connection.play(ytdl(song.url))
+    const dispatcher = serverQueue.connection.play(ytdl(song.url, {
+    quality: 'highestaudio',
+    highWaterMark: 1 << 25
+}))
     .on('finish', () => {
         if (!serverQueue.loop) serverQueue.songs.shift()
         play(guild, serverQueue.songs[0])
@@ -269,7 +282,7 @@ function play(guild, song) {
     })
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 5)
 
-    serverQueue.textChannel.send(`재생시작: **${song.title}**`)
+    serverQueue.textChannel.send(`▶️ Now Playing: **${song.title}**`)
 }
 
 client.login(process.env.TOKEN)
